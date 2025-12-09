@@ -1,0 +1,514 @@
+/* ────────────────────────────────────────────────
+   Reinicio general del estilo
+   ──────────────────────────────────────────────── */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Inter", Arial, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-dark);
+  line-height: 1.6;
+}
+
+/* ────────────────────────────────────────────────
+   Paleta de colores (Verde Esmeralda)
+   ──────────────────────────────────────────────── */
+:root {
+  --color-primary: #00a878; /* Verde esmeralda */
+  --color-primary-dark: #00785a; /* Verde profundo */
+  --color-secondary: #4ad6a6; /* Verde agua */
+  --color-white: #ffffff;
+  --color-bg: #f5f7f5; /* Fondo gris suave */
+  --color-gray: #6c757d;
+  --color-light-gray: #e3e8e4;
+  --color-dark: #1a1a1a;
+}
+
+/* ────────────────────────────────────────────────
+   Contenedor general del sitio
+   ──────────────────────────────────────────────── */
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ────────────────────────────────────────────────
+   Barra de navegación
+   ──────────────────────────────────────────────── */
+.navbar {
+  background-color: var(--color-white);
+  padding: 14px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar__logo {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-left: 5%;
+}
+
+.navbar__links {
+  margin-right: 5%;
+  display: flex;
+  gap: 22px;
+}
+
+.navbar__links a {
+  color: var(--color-dark);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.navbar__links a:hover {
+  color: var(--color-primary);
+}
+
+/* ────────────────────────────────────────────────
+   Secciones hero (encabezados de página)
+   ──────────────────────────────────────────────── */
+.hero {
+  background: linear-gradient(
+    to right,
+    var(--color-primary),
+    var(--color-secondary)
+  );
+  color: white;
+  text-align: center;
+  padding: 60px 20px;
+  margin-bottom: 35px;
+}
+
+.hero h1 {
+  font-size: 42px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.hero p {
+  font-size: 18px;
+  font-weight: 300;
+}
+
+/* ────────────────────────────────────────────────
+   Tarjetas de productos (estilo fintech)
+   ──────────────────────────────────────────────── */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px;
+  padding: 20px;
+}
+
+.card {
+  background: var(--color-white);
+  padding: 22px;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card__img {
+  width: 100%;
+  max-height: 140px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+.card__icon {
+  font-size: 48px;
+  margin-bottom: 10px;
+}
+
+.card__title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+.card__details {
+  text-align: left;
+  list-style: none;
+  margin-bottom: 15px;
+}
+
+.card__details li {
+  margin-bottom: 6px;
+}
+
+.card__button {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: background-color 0.2s ease;
+}
+
+.card__button:hover {
+  background-color: var(--color-primary-dark);
+}
+
+/* ────────────────────────────────────────────────
+   Sección del simulador de créditos
+   ──────────────────────────────────────────────── */
+.simulator {
+  background-color: var(--color-white);
+  padding: 25px;
+  border-radius: 12px;
+  max-width: 900px;
+  margin: 0 auto 40px auto;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.simulator__form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.simulator__input,
+.simulator__select {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid var(--color-light-gray);
+  border-radius: 8px;
+  font-size: 15px;
+}
+
+.simulator__button {
+  padding: 12px 24px;
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+}
+
+.simulator__button:hover {
+  background-color: var(--color-primary-dark);
+}
+
+/* ────────────────────────────────────────────────
+   Formulario de solicitud de crédito
+   ──────────────────────────────────────────────── */
+.form {
+  max-width: 900px;
+  margin: 0 auto;
+  background-color: var(--color-white);
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+}
+
+.form-section {
+  margin-bottom: 25px;
+  border: 1px solid var(--color-light-gray);
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.form-section legend {
+  font-weight: 700;
+  color: var(--color-primary);
+  padding: 0 8px;
+  font-size: 17px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0 18px 0;
+  border-radius: 8px;
+  border: 1px solid var(--color-light-gray);
+  font-size: 15px;
+}
+
+.form-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: flex-end;
+}
+
+.btn-submit {
+  background-color: var(--color-primary);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.btn-submit:hover {
+  background-color: var(--color-primary-dark);
+}
+
+.btn-reset {
+  background-color: var(--color-gray);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+/* ────────────────────────────────────────────────
+   Pie de página
+   ──────────────────────────────────────────────── */
+.footer {
+  margin-top: 60px;
+  background-color: #064c38;
+  color: white;
+  padding: 25px;
+  text-align: center;
+  font-size: 14px;
+}
+
+/* ────────────────────────────────────────────────
+   ESTILOS DEL MENÚ HAMBURGUESA (ICONO)
+   ──────────────────────────────────────────────── */
+
+.hamburger-menu {
+  /* Por defecto, lo ocultamos para que solo sea visible en móvil */
+  display: none;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 30px;
+  height: 25px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 1001; /* Asegura que esté encima de la barra de navegación */
+}
+
+.hamburger-menu .bar {
+  display: block;
+  width: 100%;
+  height: 3px;
+  background: var(--color-primary-dark);
+  border-radius: 5px;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Animación a 'X' cuando la clase 'is-open' es añadida por JS */
+.hamburger-menu.is-open .bar:nth-child(2) {
+  opacity: 0; /* Barra del medio desaparece */
+}
+
+.hamburger-menu.is-open .bar:nth-child(1) {
+  transform: translateY(11px) rotate(45deg); /* Barra superior gira y se mueve */
+}
+
+.hamburger-menu.is-open .bar:nth-child(3) {
+  transform: translateY(-11px) rotate(-45deg); /* Barra inferior gira y se mueve */
+}
+
+/* ────────────────────────────────────────────────
+   AJUSTES RESPONSIVOS (HAMBURGUESA)
+   ──────────────────────────────────────────────── */
+
+/* 1. Reset para Desktop (> 768px) */
+@media (min-width: 769px) {
+  /* Ocultar el botón de hamburguesa en escritorio */
+  .hamburger-menu {
+    display: none;
+  }
+
+  /* Asegurar que el menú siempre esté visible y en su estado normal de escritorio */
+  .navbar__links.nav-menu {
+    display: flex !important; /* Forzar visibilidad como fila */
+    position: static;
+    transform: translateX(
+      0
+    ) !important; /* Deshabilitar transformación de móvil */
+    height: auto;
+    width: auto;
+    background-color: transparent;
+    box-shadow: none;
+    z-index: auto;
+  }
+
+  /* Restablecer estilos de enlaces para escritorio (en caso de que la media query móvil los modifique) */
+  .navbar__links.nav-menu a {
+    padding: 0;
+    width: auto;
+    border-bottom: none;
+  }
+}
+
+/* 2. Ajustes para Tabletas y Móviles (Menos de 769px) */
+@media (max-width: 768px) {
+  /* El contenedor principal de la barra (Logo y Hamburguesa) debe ser horizontal */
+  .navbar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 5%;
+    height: 60px; /* Altura fija para el encabezado */
+    /* Eliminamos el 'flex-direction: column' que tenías para que logo y botón estén en línea */
+  }
+
+  /* Mostrar el botón de hamburguesa */
+  .hamburger-menu {
+    display: flex;
+    position: static;
+    margin-right: 0; /* Ya que el padding del navbar lo controla */
+    transform: none;
+  }
+
+  /* Estilos del Menú de Navegación (Oculto por defecto en móvil) */
+  .navbar__links.nav-menu {
+    /* Posicionamiento para que cubra la pantalla al abrirse */
+    position: absolute;
+    top: 60px; /* Altura del navbar */
+    left: 0;
+    width: 100%;
+    height: calc(100vh - 60px); /* Restar la altura del header */
+    background-color: var(--color-white); /* Fondo del menú */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+
+    /* Ocultar fuera de la pantalla (transición) */
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+
+    /* Disposición vertical de los enlaces */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+    z-index: 999;
+
+    /* Asegurar que los links se vean bien */
+    margin-right: 0;
+    gap: 0; /* El padding del enlace controlará el espacio */
+  }
+
+  /* Estado Abierto (El JS añade esta clase) */
+  .navbar__links.nav-menu.is-open {
+    transform: translateX(0); /* Mostrar el menú */
+  }
+
+  /* Estilo para los enlaces del menú en móvil */
+  .navbar__links.nav-menu a {
+    padding: 15px 20px;
+    width: 100%;
+    text-align: center;
+    border-bottom: 1px solid var(--color-light-gray);
+  }
+
+  .navbar__links.nav-menu a:hover {
+    background-color: var(--color-bg);
+  }
+
+  /* Ajustes que ya tenías y siguen siendo válidos */
+  .hero h1 {
+    font-size: 32px;
+  }
+
+  .simulator__form {
+    flex-direction: column;
+  }
+
+  .form {
+    padding: 18px;
+  }
+
+  /* El resto de tus reglas generales para 768px y 480px: */
+
+  /* Hero más compacto */
+  .hero {
+    padding: 40px 20px;
+  }
+
+  .hero h1 {
+    font-size: 2rem;
+  }
+
+  .hero p {
+    font-size: 1rem;
+  }
+
+  /* Contenedor general */
+  .container {
+    width: 100%;
+    padding: 10px;
+  }
+
+  /* Cards */
+  .cards-grid {
+    grid-template-columns: 1fr;
+    padding: 10px;
+  }
+
+  .card {
+    padding: 20px;
+  }
+
+  .card__title {
+    font-size: 1.3rem;
+  }
+
+  /* Simulador */
+  .simulator {
+    padding: 10px;
+  }
+
+  .simulator__form {
+    gap: 12px;
+  }
+
+  /* Formularios de solicitud */
+  .form {
+    padding: 12px;
+  }
+
+  .form-section {
+    padding: 15px;
+  }
+
+  .form-buttons {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .btn-submit,
+  .btn-reset {
+    width: 100%;
+  }
+}
+
+/* Ajustes para móviles pequeños */
+@media (max-width: 480px) {
+  .hero h1 {
+    font-size: 1.7rem;
+  }
+}

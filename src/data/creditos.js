@@ -1,0 +1,42 @@
+export const creditos = {
+  inversion: {
+    nombre: "Crédito Libre Inversión",
+    tasa: 0.015,
+    montoMin: 1000000,
+    montoMax: 50000000,
+    plazoMax: 60,
+    icon: "💳",
+  },
+  vehiculo: {
+    nombre: "Crédito Vehículo",
+    tasa: 0.012,
+    montoMin: 5000000,
+    montoMax: 80000000,
+    plazoMax: 72,
+    icon: "🚗",
+  },
+  vivienda: {
+    nombre: "Crédito Vivienda",
+    tasa: 0.01,
+    montoMin: 30000000,
+    montoMax: 500000000,
+    plazoMax: 240,
+    icon: "🏠",
+  },
+  educativo: {
+    nombre: "Crédito Educativo",
+    tasa: 0.009,
+    montoMin: 1000000,
+    montoMax: 30000000,
+    plazoMax: 48,
+    icon: "🎓",
+  },
+  empresarial: {
+    nombre: "Crédito Empresarial",
+    tasa: 0.013,
+    montoMin: 10000000,
+    montoMax: 200000000,
+    plazoMax: 84,
+    icon: "🏢",
+  },
+};
