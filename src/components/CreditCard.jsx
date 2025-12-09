@@ -1,23 +1,32 @@
-export default function CreditCard({ icon, title, monto, tasa, plazo }) {
+// src/components/CreditCard.jsx
+export default function CreditCard({ credito }) {
   return (
-    <article className="card">
-      <div className="card__icon">{icon}</div>
+    <div className="card">
+      <div className="card__icon">{credito.icono}</div>
 
-      <h3 className="card__title">{title}</h3>
+      <h3 className="card__title">{credito.nombre}</h3>
 
       <ul className="card__details">
         <li>
-          <strong>Monto:</strong> {monto}
+          <strong>Tasa mensual:</strong> {(credito.tasa * 100).toFixed(2)}%
         </li>
         <li>
-          <strong>Tasa:</strong> {tasa}
+          <strong>Monto mínimo:</strong> ${credito.montoMin.toLocaleString()}
         </li>
         <li>
-          <strong>Plazo máximo:</strong> {plazo}
+          <strong>Monto máximo:</strong> ${credito.montoMax.toLocaleString()}
+        </li>
+        <li>
+          <strong>Plazo máximo:</strong> {credito.plazoMax} meses
         </li>
       </ul>
 
-      <button className="card__button">Solicitar</button>
-    </article>
+      <button
+        className="card__button"
+        onClick={() => alert(`Seleccionaste: ${credito.nombre}`)}
+      >
+        Solicitar
+      </button>
+    </div>
   );
 }

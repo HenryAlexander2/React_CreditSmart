@@ -6,6 +6,9 @@ import Home from "./pages/Home";
 import Simulator from "./pages/Simulator";
 import RequestCredit from "./pages/RequestCredit";
 
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import "./styles/global.css";
 
 export default function App() {
@@ -20,6 +23,8 @@ export default function App() {
       </Routes>
 
       <Footer />
+      {/* CONTENEDOR DE ALERTAS */}
+      <ToastContainer position="top-right" autoClose={3000} />
     </BrowserRouter>
   );
 }

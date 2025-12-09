@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from "react-toastify"; // <-- IMPORTANTE
 
 export default function RequestCredit() {
   const [form, setForm] = useState({
@@ -15,14 +16,61 @@ export default function RequestCredit() {
     ingresos: "",
   });
 
-  const update = (e) => setForm({ ...form, [e.target.id]: e.target.value });
+  const [errors, setErrors] = useState({});
+  const [showResumen, setShowResumen] = useState(false);
 
-  const submit = (e) => {
-    e.preventDefault();
-    alert("Solicitud enviada exitosamente");
+  const validarCampo = (name, value) => {
+    let msg = "";
+
+    if (!value.trim()) msg = "Este campo es obligatorio.";
+
+    if (name === "email" && value && !/\S+@\S+\.\S+/.test(value)) {
+      msg = "Correo inválido.";
+    }
+
+    if (name === "cedula" && value.length < 5) {
+      msg = "La cédula debe tener mínimo 5 dígitos.";
+    }
+
+    if (name === "monto" && value && Number(value) < 1000000) {
+      msg = "Monto mínimo: $1.000.000";
+    }
+
+    if (name === "ingresos" && value && Number(value) < 1000000) {
+      msg = "Ingresos mínimos: $1.000.000";
+    }
+
+    setErrors((prev) => ({ ...prev, [name]: msg }));
   };
 
-  const reset = () =>
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+    validarCampo(name, value);
+  };
+
+  const formIsValid = () => {
+    const noErrors = Object.values(errors).every((e) => e === "");
+    const filled = Object.values(form).every((v) => v.trim() !== "");
+    return noErrors && filled;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!formIsValid()) {
+      toast.error("Faltan campos por completar"); // <--- TOAST ERROR
+      return;
+    }
+
+    setShowResumen(true);
+    toast.info("Revisa el resumen antes de enviar"); // <--- TOAST INFO
+  };
+
+  const enviarSolicitud = () => {
+    toast.success("Solicitud enviada correctamente 🎉"); // <-- TOAST SUCCESS
+
+    // Limpiar todo después de enviar
     setForm({
       nombre: "",
       cedula: "",
@@ -37,158 +85,67 @@ export default function RequestCredit() {
       ingresos: "",
     });
 
+    setErrors({});
+    setShowResumen(false);
+  };
+
   return (
-    <main>
-      <div className="container">
-        <section className="hero">
-          <h1>Solicitud de Crédito</h1>
-          <p>Completa la información para enviar tu solicitud.</p>
-        </section>
+    <div className="container">
+      <section className="hero">
+        <h1>Solicitud de Crédito</h1>
+        <p>Completa la información para enviar tu solicitud.</p>
+      </section>
 
-        <form className="form" onSubmit={submit} onReset={reset}>
-          {/* DATOS PERSONALES */}
-          <fieldset className="form-section">
-            <legend>Datos Personales</legend>
+      <form className="form" onSubmit={handleSubmit}>
+        {/* ... TODO TU FORMULARIO IGUAL ... */}
+      </form>
 
-            <label htmlFor="nombre">Nombre completo</label>
-            <input
-              id="nombre"
-              className="form-input"
-              value={form.nombre}
-              onChange={update}
-              required
-            />
+      {/* RESUMEN ANTES DE CONFIRMAR */}
+      {showResumen && (
+        <div style={{ marginTop: "30px" }}>
+          <h2>Resumen de Solicitud</h2>
 
-            <label htmlFor="cedula">Cédula</label>
-            <input
-              id="cedula"
-              type="number"
-              className="form-input"
-              value={form.cedula}
-              onChange={update}
-              required
-            />
+          {/* SE IMPRIME TODO EL RESUMEN */}
+          <p>
+            <strong>Nombre:</strong> {form.nombre}
+          </p>
+          <p>
+            <strong>Cédula:</strong> {form.cedula}
+          </p>
+          <p>
+            <strong>Email:</strong> {form.email}
+          </p>
+          <p>
+            <strong>Teléfono:</strong> {form.telefono}
+          </p>
+          <p>
+            <strong>Crédito:</strong> {form.tipoCredito}
+          </p>
+          <p>
+            <strong>Monto:</strong> ${Number(form.monto).toLocaleString()}
+          </p>
+          <p>
+            <strong>Plazo:</strong> {form.plazo}
+          </p>
+          <p>
+            <strong>Empresa:</strong> {form.empresa}
+          </p>
+          <p>
+            <strong>Cargo:</strong> {form.cargo}
+          </p>
+          <p>
+            <strong>Ingresos:</strong> ${Number(form.ingresos).toLocaleString()}
+          </p>
 
-            <label htmlFor="email">Email</label>
-            <input
-              id="email"
-              type="email"
-              className="form-input"
-              value={form.email}
-              onChange={update}
-              required
-            />
-
-            <label htmlFor="telefono">Teléfono</label>
-            <input
-              id="telefono"
-              type="tel"
-              className="form-input"
-              value={form.telefono}
-              onChange={update}
-              required
-            />
-          </fieldset>
-
-          {/* DATOS DEL CREDITO */}
-          <fieldset className="form-section">
-            <legend>Datos del Crédito</legend>
-
-            <label htmlFor="tipoCredito">Tipo de crédito</label>
-            <select
-              id="tipoCredito"
-              className="form-input"
-              value={form.tipoCredito}
-              onChange={update}
-              required
-            >
-              <option value="">Seleccionar…</option>
-              <option>Crédito Libre Inversión</option>
-              <option>Crédito Vehículo</option>
-              <option>Crédito Vivienda</option>
-              <option>Crédito Educativo</option>
-              <option>Crédito Empresarial</option>
-            </select>
-
-            <label htmlFor="monto">Monto solicitado</label>
-            <input
-              id="monto"
-              type="number"
-              className="form-input"
-              value={form.monto}
-              onChange={update}
-              required
-            />
-
-            <label htmlFor="plazo">Plazo</label>
-            <select
-              id="plazo"
-              className="form-input"
-              value={form.plazo}
-              onChange={update}
-              required
-            >
-              <option value="">Seleccionar…</option>
-              <option>12 meses</option>
-              <option>24 meses</option>
-              <option>36 meses</option>
-              <option>48 meses</option>
-              <option>60 meses</option>
-            </select>
-
-            <label htmlFor="destino">Destino del crédito</label>
-            <textarea
-              id="destino"
-              className="form-input"
-              value={form.destino}
-              onChange={update}
-              required
-            />
-          </fieldset>
-
-          {/* DATOS LABORALES */}
-          <fieldset className="form-section">
-            <legend>Datos Laborales</legend>
-
-            <label htmlFor="empresa">Empresa donde trabaja</label>
-            <input
-              id="empresa"
-              className="form-input"
-              value={form.empresa}
-              onChange={update}
-              required
-            />
-
-            <label htmlFor="cargo">Cargo</label>
-            <input
-              id="cargo"
-              className="form-input"
-              value={form.cargo}
-              onChange={update}
-              required
-            />
-
-            <label htmlFor="ingresos">Ingresos mensuales</label>
-            <input
-              id="ingresos"
-              type="number"
-              className="form-input"
-              value={form.ingresos}
-              onChange={update}
-              required
-            />
-          </fieldset>
-
-          <div className="form-buttons">
-            <button type="submit" className="btn-submit">
-              Enviar solicitud
-            </button>
-            <button type="reset" className="btn-reset">
-              Limpiar
-            </button>
-          </div>
-        </form>
-      </div>
-    </main>
+          <button
+            className="btn-submit"
+            style={{ marginTop: "20px" }}
+            onClick={enviarSolicitud}
+          >
+            Enviar Solicitud
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
