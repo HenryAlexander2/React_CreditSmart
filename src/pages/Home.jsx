@@ -1,7 +1,5 @@
-// src/pages/Home.jsx
-
 import { useState } from "react";
-// Importar creditos (Asumiendo que hemos corregido este archivo a Array de Objetos)
+// Importar creditos
 import { creditos } from "../data/creditos";
 import CreditCard from "../components/CreditCard";
 
@@ -14,8 +12,6 @@ export default function Home() {
   //    PROCESAR FILTROS
   // ---------------------------------
   const filtrarCreditos = () => {
-    // Si la estructura de datos es grande, puedes inicializar con una copia
-    // let lista = [...creditos];
     let lista = creditos;
 
     // 1. Filtro por búsqueda en nombre

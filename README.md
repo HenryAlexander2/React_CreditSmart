@@ -1,7 +1,3 @@
-¡Por supuesto! Incluir una sección sobre los commits más relevantes ayuda a mostrar la evolución del proyecto y tus habilidades de control de versiones.
-
-Aquí tienes el README actualizado, con una nueva sección destacando los pasos clave del desarrollo (usando commits imaginarios que reflejan nuestro proceso de trabajo).
-
 CreditSmart: Plataforma de Gestión y Simulación de Créditos
 Por Henry Salazar
 Introducción al Proyecto

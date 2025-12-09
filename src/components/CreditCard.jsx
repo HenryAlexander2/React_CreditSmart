@@ -1,4 +1,3 @@
-// src/components/CreditCard.jsx (Ajustado)
 export default function CreditCard({ credito }) {
   return (
     <div className="card">
