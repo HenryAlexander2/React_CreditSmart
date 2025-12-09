@@ -1,6 +1,8 @@
 // src/pages/Home.jsx
+
 import { useState } from "react";
-import { creditos } from "../data/credits";
+// Importar creditos (Asumiendo que hemos corregido este archivo a Array de Objetos)
+import { creditos } from "../data/creditos";
 import CreditCard from "../components/CreditCard";
 
 export default function Home() {
@@ -9,10 +11,12 @@ export default function Home() {
   const [ordenTasa, setOrdenTasa] = useState(""); // asc | ""
 
   // ---------------------------------
-  //   PROCESAR FILTROS
+  //    PROCESAR FILTROS
   // ---------------------------------
   const filtrarCreditos = () => {
-    let lista = [...creditos];
+    // Si la estructura de datos es grande, puedes inicializar con una copia
+    // let lista = [...creditos];
+    let lista = creditos;
 
     // 1. Filtro por búsqueda en nombre
     if (busqueda.trim() !== "") {
@@ -27,9 +31,9 @@ export default function Home() {
       lista = lista.filter((c) => c.montoMin <= monto && c.montoMax >= monto);
     }
 
-    // 3. Orden por tasa
+    // 3. Orden por tasa (Usando inmutabilidad con [...lista].sort())
     if (ordenTasa === "asc") {
-      lista.sort((a, b) => a.tasa - b.tasa);
+      lista = [...lista].sort((a, b) => a.tasa - b.tasa);
     }
 
     return lista;
@@ -85,7 +89,7 @@ export default function Home() {
             style={{ minWidth: "160px" }}
           >
             <option value="">Ordenar por tasa</option>
-            <option value="asc">Menor a mayor</option>
+            <option value="asc">Menor a mayor (Tasa)</option>
           </select>
         </div>
       </div>
@@ -94,11 +98,12 @@ export default function Home() {
       <div className="cards-grid container">
         {listaFinal.length > 0 ? (
           listaFinal.map((credito) => (
-            <CreditCard key={credito.id} credit={credito} />
+            // Key estable y prop 'credit' pasada correctamente
+            <CreditCard key={credito.id} credito={credito} />
           ))
         ) : (
           <p style={{ textAlign: "center", width: "100%" }}>
-            ❌ No hay créditos disponibles con los filtros seleccionados.
+            No hay créditos disponibles con los filtros seleccionados.
           </p>
         )}
       </div>

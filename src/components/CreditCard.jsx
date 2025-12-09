@@ -1,8 +1,9 @@
-// src/components/CreditCard.jsx
+// src/components/CreditCard.jsx (Ajustado)
 export default function CreditCard({ credito }) {
   return (
     <div className="card">
-      <div className="card__icon">{credito.icono}</div>
+      {/* CORRECCIÓN: Usar credito.icon (no icono) */}
+      <div className="card__icon">{credito.icon}</div>
 
       <h3 className="card__title">{credito.nombre}</h3>
 

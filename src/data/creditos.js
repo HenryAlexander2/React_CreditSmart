@@ -1,13 +1,16 @@
-export const creditos = {
-  inversion: {
+// Array simple de objetos
+export const creditos = [
+  {
+    id: "inversion", // Añadimos el ID para la key de React
     nombre: "Crédito Libre Inversión",
     tasa: 0.015,
     montoMin: 1000000,
     montoMax: 50000000,
     plazoMax: 60,
-    icon: "💳",
+    icon: "💳", // La propiedad para el ícono
   },
-  vehiculo: {
+  {
+    id: "vehiculo",
     nombre: "Crédito Vehículo",
     tasa: 0.012,
     montoMin: 5000000,
@@ -15,7 +18,8 @@ export const creditos = {
     plazoMax: 72,
     icon: "🚗",
   },
-  vivienda: {
+  {
+    id: "vivienda",
     nombre: "Crédito Vivienda",
     tasa: 0.01,
     montoMin: 30000000,
@@ -23,7 +27,8 @@ export const creditos = {
     plazoMax: 240,
     icon: "🏠",
   },
-  educativo: {
+  {
+    id: "educativo",
     nombre: "Crédito Educativo",
     tasa: 0.009,
     montoMin: 1000000,
@@ -31,7 +36,8 @@ export const creditos = {
     plazoMax: 48,
     icon: "🎓",
   },
-  empresarial: {
+  {
+    id: "empresarial",
     nombre: "Crédito Empresarial",
     tasa: 0.013,
     montoMin: 10000000,
@@ -39,4 +45,4 @@ export const creditos = {
     plazoMax: 84,
     icon: "🏢",
   },
-};
+];

@@ -512,3 +512,69 @@ body {
     font-size: 1.7rem;
   }
 }
+
+.fade-in {
+  animation: fadeIn 0.6s ease forwards;
+  opacity: 0;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card {
+  background: var(--color-white);
+  padding: 22px;
+  border-radius: 18px; /* antes 14px */
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06); /* sombra más suave */
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+button,
+.card__button,
+.btn-submit,
+.btn-reset {
+  transition: background-color 0.25s ease, transform 0.2s ease;
+}
+
+button:hover,
+.card__button:hover,
+.btn-submit:hover,
+.btn-reset:hover {
+  transform: scale(1.03);
+}
+
+.navbar {
+  transition: box-shadow 0.25s ease, background-color 0.25s ease;
+}
+
+.navbar:hover {
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+}
+
+input,
+select,
+textarea {
+  transition: border 0.25s ease, box-shadow 0.25s ease;
+  border-radius: 10px; /* más moderno */
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border: 1px solid var(--color-primary);
+  box-shadow: 0 0 6px rgba(0, 168, 120, 0.3);
+  outline: none;
+}

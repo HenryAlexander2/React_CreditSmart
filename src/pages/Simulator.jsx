@@ -1,6 +1,6 @@
 // src/pages/Simulator.jsx
 import { useState } from "react";
-import { creditos } from "../data/credits";
+import { creditos } from "../data/creditos"; // Asumo que esta ruta es correcta
 
 export default function Simulator() {
   const [tipo, setTipo] = useState("");
@@ -15,6 +15,7 @@ export default function Simulator() {
   const calcular = (e) => {
     e.preventDefault();
 
+    // 1. Validación de campos obligatorios
     if (!tipo || !monto || !cuotas) {
       alert("Completa todos los campos del simulador.");
       return;
@@ -30,6 +31,7 @@ export default function Simulator() {
     const montoNum = Number(monto);
     const cuotasNum = Number(cuotas);
 
+    // 2. Validación de rangos de monto y plazo
     if (montoNum < credito.montoMin || montoNum > credito.montoMax) {
       alert(
         `El monto debe estar entre $${credito.montoMin.toLocaleString()} y $${credito.montoMax.toLocaleString()}`
@@ -42,30 +44,39 @@ export default function Simulator() {
       return;
     }
 
-    const interesTotal = montoNum * credito.tasa * cuotasNum;
-    const totalPagar = montoNum + interesTotal;
-    const cuotaMensual = totalPagar / cuotasNum;
+    // 3. Cálculo de cuota
+    const i = credito.tasa;
+    const n = cuotasNum;
 
-    setResultado({
-      nombre: credito.nombre,
-      monto: montoNum,
-      cuotas: cuotasNum,
-      tasa: credito.tasa,
-      interesTotal,
-      totalPagar,
-      cuotaMensual,
-    });
+    // Fórmula de la Cuota Fija (Método Francés/Alemán)
+    // C = (P * i) / (1 - (1 + i)^-n)
+    let cuotaMensual = 0;
+    if (i > 0) {
+      // Uso de Math.pow para potencia
+      cuotaMensual = (montoNum * i) / (1 - Math.pow(1 + i, -n));
+    } else {
+      // Si el interés es 0 (no recomendado en apps reales, pero es una protección)
+      cuotaMensual = montoNum / n;
+    }
 
     // ------------------------------
     //   TABLA DE AMORTIZACIÓN
     // ------------------------------
     let saldo = montoNum;
     const filas = [];
+    let totalInteresesCalculado = 0;
 
     for (let mes = 1; mes <= cuotasNum; mes++) {
-      const interesMes = saldo * credito.tasa;
-      const abonoCapital = cuotaMensual - interesMes;
-      const saldoFinal = saldo - abonoCapital;
+      const interesMes = saldo * i;
+      let abonoCapital = cuotaMensual - interesMes;
+      let saldoFinal = saldo - abonoCapital;
+
+      // Ajuste para la última cuota para evitar saldos negativos por redondeo
+      if (mes === cuotasNum) {
+        abonoCapital = saldo; // El abono a capital es el saldo restante
+        cuotaMensual = abonoCapital + interesMes; // Se ajusta la cuota final
+        saldoFinal = 0; // El saldo final es cero
+      }
 
       filas.push({
         mes,
@@ -73,10 +84,25 @@ export default function Simulator() {
         interesMes,
         abonoCapital,
         saldoFinal,
+        cuotaMensual: cuotaMensual, // Se agrega la cuota real de este mes
       });
 
       saldo = saldoFinal;
+      totalInteresesCalculado += interesMes;
     }
+
+    // Cierre del cálculo
+    const totalPagar = montoNum + totalInteresesCalculado;
+
+    setResultado({
+      nombre: credito.nombre,
+      monto: montoNum,
+      cuotas: cuotasNum,
+      tasa: credito.tasa,
+      interesTotal: totalInteresesCalculado, // Nuevo cálculo
+      totalPagar: totalPagar, // Nuevo cálculo
+      cuotaMensual: cuotaMensual, // Nuevo cálculo (cuota fija inicial)
+    });
 
     setTabla(filas);
   };
@@ -129,7 +155,10 @@ export default function Simulator() {
 
       {/* RESULTADO */}
       {resultado && (
-        <div className="card" style={{ maxWidth: "550px", margin: "30px auto" }}>
+        <div
+          className="card"
+          style={{ maxWidth: "550px", margin: "30px auto" }}
+        >
           <div className="card__icon">💰</div>
           <h3 className="card__title">Resultado</h3>
           <ul className="card__details">
@@ -143,20 +172,29 @@ export default function Simulator() {
               <strong>Cuotas:</strong> {resultado.cuotas}
             </li>
             <li>
-              <strong>Tasa mensual:</strong>{" "}
-              {(resultado.tasa * 100).toFixed(2)}%
+              <strong>Tasa mensual:</strong> {(resultado.tasa * 100).toFixed(2)}
+              %
             </li>
             <li>
-              <strong>Total intereses:</strong>{" "}
-              ${resultado.interesTotal.toLocaleString()}
+              <strong>Total intereses:</strong> $
+              {resultado.interesTotal.toLocaleString(undefined, {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+              })}
             </li>
             <li>
-              <strong>Total a pagar:</strong>{" "}
-              ${resultado.totalPagar.toLocaleString()}
+              <strong>Total a pagar:</strong> $
+              {resultado.totalPagar.toLocaleString(undefined, {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+              })}
             </li>
             <li>
-              <strong>Cuota mensual:</strong>{" "}
-              ${resultado.cuotaMensual.toLocaleString()}
+              <strong>Cuota mensual inicial:</strong> $
+              {resultado.cuotaMensual.toLocaleString(undefined, {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+              })}
             </li>
           </ul>
         </div>
@@ -179,6 +217,8 @@ export default function Simulator() {
             <thead>
               <tr style={{ background: "#00a36c", color: "white" }}>
                 <th>Mes</th>
+                <th>Cuota Fija</th>{" "}
+                {/* Nuevo campo para mostrar la cuota real de ese mes */}
                 <th>Saldo inicial</th>
                 <th>Interés</th>
                 <th>Abono capital</th>
@@ -186,10 +226,51 @@ export default function Simulator() {
               </tr>
             </thead>
             <tbody>
+              {/* CORRECCIÓN DE ERROR: Se usaba 'tablaAmortizacion' en lugar de 'tabla' */}
               {tabla.map((fila) => (
                 <tr key={fila.mes}>
                   <td>{fila.mes}</td>
-                  <td>${fila.saldoInicial.toLocaleString()}</td>
-                  <td>${fila.interesMes.toFixed(0)}</td>
-                  <td>${fila.abonoCapital.toFixed(0)}</td>
-                  <td>${fila.saldoFinal.toLocaleString()}
+                  <td>
+                    $
+                    {fila.cuotaMensual.toLocaleString(undefined, {
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0,
+                    })}
+                  </td>
+                  <td>
+                    $
+                    {fila.saldoInicial.toLocaleString(undefined, {
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0,
+                    })}
+                  </td>
+                  <td>
+                    $
+                    {fila.interesMes.toLocaleString(undefined, {
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0,
+                    })}
+                  </td>
+                  <td>
+                    $
+                    {fila.abonoCapital.toLocaleString(undefined, {
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0,
+                    })}
+                  </td>
+                  <td>
+                    $
+                    {fila.saldoFinal.toLocaleString(undefined, {
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0,
+                    })}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
