@@ -1,6 +1,5 @@
-// src/pages/Simulator.jsx
 import { useState } from "react";
-import { creditos } from "../data/creditos"; // Asumo que esta ruta es correcta
+import { creditos } from "../data/creditos";
 
 export default function Simulator() {
   const [tipo, setTipo] = useState("");
@@ -226,7 +225,7 @@ export default function Simulator() {
               </tr>
             </thead>
             <tbody>
-              {/* CORRECCIÓN DE ERROR: Se usaba 'tablaAmortizacion' en lugar de 'tabla' */}
+              {/* tabla Amortizacion */}
               {tabla.map((fila) => (
                 <tr key={fila.mes}>
                   <td>{fila.mes}</td>
