@@ -1,4 +1,4 @@
-// src/pages/Home.jsx (NUEVA VERSIÓN CON FIREBASE)
+// VERSIÓN CON FIREBASE
 
 import { useState, useEffect } from "react";
 // Importaciones de Firebase

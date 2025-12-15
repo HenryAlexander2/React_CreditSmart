@@ -96,7 +96,6 @@ export default function RequestCredit() {
     let newErrors = {};
 
     Object.keys(form).forEach((key) => {
-      // Ignoramos la validación en Plazo y Destino si la aplicas en el formulario.
       // Aquí se valida que no estén vacíos.
       if (!form[key].toString().trim()) {
         newErrors[key] = "Este campo es obligatorio.";

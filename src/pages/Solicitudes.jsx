@@ -1,5 +1,3 @@
-// src/pages/Solicitudes.jsx
-
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { db } from "../firebase";

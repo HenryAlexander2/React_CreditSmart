@@ -1,5 +1,3 @@
-// src/components/Navbar.jsx (Versión para el Usuario Final)
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
