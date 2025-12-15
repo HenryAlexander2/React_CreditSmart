@@ -1,6 +1,11 @@
-import { useState } from "react";
+// src/pages/RequestCredit.jsx
+
+import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
-import { creditos } from "../data/creditos";
+
+// Importaciones de Firebase y Firestore
+import { db } from "../firebase";
+import { collection, getDocs, addDoc } from "firebase/firestore";
 
 // Componente simple para mostrar mensajes de error
 const ErrorMessage = ({ message }) => (
@@ -26,18 +31,41 @@ export default function RequestCredit() {
 
   const [errors, setErrors] = useState({});
   const [showResumen, setShowResumen] = useState(false);
+  const [creditosDisponibles, setCreditosDisponibles] = useState([]); // Estado para tipos de crédito
+  const [loadingCreditos, setLoadingCreditos] = useState(true); // Estado de loading
 
-  // ---------------------------------
+  // FUNCIÓN PARA CARGAR TIPOS DE CRÉDITO DESDE FIRESTORE
+  useEffect(() => {
+    const cargarTiposCredito = async () => {
+      try {
+        const creditosCollection = collection(db, "creditos");
+        const creditosSnapshot = await getDocs(creditosCollection);
+
+        const creditosList = creditosSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        setCreditosDisponibles(creditosList);
+      } catch (error) {
+        console.error("Error al cargar tipos de crédito:", error);
+        toast.error(
+          "Error al cargar opciones de crédito desde la base de datos."
+        );
+      } finally {
+        setLoadingCreditos(false);
+      }
+    };
+
+    cargarTiposCredito();
+  }, []);
+
   // Lógica de Validación
-  // ---------------------------------
   const validarCampo = (name, value) => {
     let msg = "";
-
-    // Validación de campo obligatorio
     if (!value.toString().trim()) {
       msg = "Este campo es obligatorio.";
     } else {
-      // Validaciones específicas solo si hay valor
       if (name === "email" && !/\S+@\S+\.\S+/.test(value)) {
         msg = "Correo inválido.";
       }
@@ -51,43 +79,73 @@ export default function RequestCredit() {
         msg = `${name === "monto" ? "Monto" : "Ingresos"} mínimos: $1.000.000`;
       }
     }
-
-    // Actualiza solo el error del campo actual
     setErrors((prev) => ({ ...prev, [name]: msg }));
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // 1. Actualiza el estado del formulario
     setForm((prev) => ({ ...prev, [name]: value }));
-    // 2. Ejecuta la validación en tiempo real
     validarCampo(name, value);
   };
 
   const formIsValid = () => {
-    // 1. Verificar si hay algún error visible en el estado `errors`
     const hasErrors = Object.values(errors).some((e) => e !== "");
     if (hasErrors) return false;
 
-    // 2. Ejecutar validación final de campos vacíos para todos los campos
     let allValid = true;
     let newErrors = {};
 
     Object.keys(form).forEach((key) => {
+      // Ignoramos la validación en Plazo y Destino si la aplicas en el formulario.
+      // Aquí se valida que no estén vacíos.
       if (!form[key].toString().trim()) {
         newErrors[key] = "Este campo es obligatorio.";
         allValid = false;
       }
     });
-
-    // Actualizar errores y retornar la validez
     setErrors((prev) => ({ ...prev, ...newErrors }));
     return allValid;
   };
 
-  // ---------------------------------
-  // Manejo de Envío y Resumen
-  // ---------------------------------
+  // FUNCIÓN PARA ENVIAR Y PERSISTIR EN FIRESTORE
+  const enviarSolicitud = async () => {
+    try {
+      const solicitudesCollection = collection(db, "solicitudes");
+
+      const solicitudData = {
+        ...form,
+        fechaSolicitud: new Date(),
+        estado: "Pendiente Revisión",
+        monto: Number(form.monto),
+        ingresos: Number(form.ingresos),
+      };
+
+      await addDoc(solicitudesCollection, solicitudData);
+
+      toast.success("Solicitud enviada y guardada correctamente en la nube 🎉");
+
+      // Limpiar el estado después del envío exitoso
+      setForm({
+        nombre: "",
+        cedula: "",
+        email: "",
+        telefono: "",
+        tipoCredito: "",
+        monto: "",
+        plazo: "",
+        destino: "",
+        empresa: "",
+        cargo: "",
+        ingresos: "",
+      });
+      setErrors({});
+      setShowResumen(false);
+    } catch (error) {
+      console.error("Error al guardar solicitud:", error);
+      toast.error("Error al guardar la solicitud. Intenta nuevamente.");
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -100,31 +158,10 @@ export default function RequestCredit() {
     toast.info("Revisa el resumen antes de enviar");
   };
 
-  const enviarSolicitud = () => {
-    toast.success("Solicitud enviada correctamente 🎉");
-
-    // Limpiar formulario y estados después del envío exitoso
-    setForm({
-      nombre: "",
-      cedula: "",
-      email: "",
-      telefono: "",
-      tipoCredito: "",
-      monto: "",
-      plazo: "",
-      destino: "",
-      empresa: "",
-      cargo: "",
-      ingresos: "",
-    });
-
-    setErrors({});
-    setShowResumen(false);
-  };
-
   // Obtener el nombre completo del crédito para el resumen
   const nombreCredito =
-    creditos.find((c) => c.id === form.tipoCredito)?.nombre || form.tipoCredito;
+    creditosDisponibles.find((c) => c.id === form.tipoCredito)?.nombre ||
+    form.tipoCredito;
 
   return (
     <div className="container">
@@ -133,7 +170,6 @@ export default function RequestCredit() {
         <p>Completa la información para enviar tu solicitud.</p>
       </section>
 
-      {/* Contenedor principal centrado */}
       <div
         className="simulator"
         style={{
@@ -143,7 +179,7 @@ export default function RequestCredit() {
           alignItems: "center",
         }}
       >
-        {/* FORMULARIO DE ENTRADA (Muestra si NO hay resumen) */}
+        {/* FORMULARIO DE ENTRADA (COMPLETO) */}
         {!showResumen && (
           <form
             className="simulator__form"
@@ -152,9 +188,15 @@ export default function RequestCredit() {
           >
             <h2 style={{ marginBottom: "20px" }}>Datos Personales</h2>
 
-            {/* FILA 1: NOMBRE Y CÉDULA */}
-            <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
-              {/* NOMBRE */}
+            {/* FILAS DE INPUTS DE DATOS PERSONALES */}
+            <div
+              style={{
+                display: "flex",
+                gap: "20px",
+                flexWrap: "wrap",
+                marginBottom: "20px",
+              }}
+            >
               <div style={{ flex: 1, minWidth: "300px" }}>
                 <input
                   className={`simulator__input ${
@@ -168,8 +210,6 @@ export default function RequestCredit() {
                 />
                 {errors.nombre && <ErrorMessage message={errors.nombre} />}
               </div>
-
-              {/* CÉDULA */}
               <div style={{ flex: 1, minWidth: "300px" }}>
                 <input
                   className={`simulator__input ${
@@ -177,7 +217,7 @@ export default function RequestCredit() {
                   }`}
                   type="number"
                   name="cedula"
-                  placeholder="Cédula / ID *"
+                  placeholder="Cédula *"
                   value={form.cedula}
                   onChange={handleChange}
                 />
@@ -185,9 +225,14 @@ export default function RequestCredit() {
               </div>
             </div>
 
-            {/* FILA 2: EMAIL Y TELÉFONO */}
-            <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
-              {/* EMAIL */}
+            <div
+              style={{
+                display: "flex",
+                gap: "20px",
+                flexWrap: "wrap",
+                marginBottom: "20px",
+              }}
+            >
               <div style={{ flex: 1, minWidth: "300px" }}>
                 <input
                   className={`simulator__input ${
@@ -201,16 +246,14 @@ export default function RequestCredit() {
                 />
                 {errors.email && <ErrorMessage message={errors.email} />}
               </div>
-
-              {/* TELÉFONO */}
               <div style={{ flex: 1, minWidth: "300px" }}>
                 <input
                   className={`simulator__input ${
                     errors.telefono ? "has-error" : ""
                   }`}
-                  type="number"
+                  type="tel"
                   name="telefono"
-                  placeholder="Teléfono *"
+                  placeholder="Teléfono de contacto *"
                   value={form.telefono}
                   onChange={handleChange}
                 />
@@ -222,8 +265,15 @@ export default function RequestCredit() {
               Detalles de la Solicitud
             </h2>
 
-            {/* FILA 3: TIPO CRÉDITO Y MONTO */}
-            <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
+            {/* FILA 3: TIPO CRÉDITO Y MONTO (Ya estaba bien) */}
+            <div
+              style={{
+                display: "flex",
+                gap: "20px",
+                flexWrap: "wrap",
+                marginBottom: "20px",
+              }}
+            >
               {/* TIPO CRÉDITO */}
               <div style={{ flex: 1, minWidth: "300px" }}>
                 <select
@@ -233,9 +283,14 @@ export default function RequestCredit() {
                   name="tipoCredito"
                   value={form.tipoCredito}
                   onChange={handleChange}
+                  disabled={loadingCreditos}
                 >
-                  <option value="">Selecciona el crédito *</option>
-                  {creditos.map((c) => (
+                  <option value="">
+                    {loadingCreditos
+                      ? "Cargando opciones..."
+                      : "Selecciona el crédito *"}
+                  </option>
+                  {creditosDisponibles.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.nombre}
                     </option>
@@ -263,7 +318,14 @@ export default function RequestCredit() {
             </div>
 
             {/* FILA 4: PLAZO Y DESTINO */}
-            <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
+            <div
+              style={{
+                display: "flex",
+                gap: "20px",
+                flexWrap: "wrap",
+                marginBottom: "20px",
+              }}
+            >
               {/* PLAZO */}
               <div style={{ flex: 1, minWidth: "300px" }}>
                 <input
@@ -272,13 +334,12 @@ export default function RequestCredit() {
                   }`}
                   type="number"
                   name="plazo"
-                  placeholder="Plazo en meses *"
+                  placeholder="Plazo en meses (ej. 36) *"
                   value={form.plazo}
                   onChange={handleChange}
                 />
                 {errors.plazo && <ErrorMessage message={errors.plazo} />}
               </div>
-
               {/* DESTINO */}
               <div style={{ flex: 1, minWidth: "300px" }}>
                 <input
@@ -296,11 +357,18 @@ export default function RequestCredit() {
             </div>
 
             <h2 style={{ marginBottom: "20px", marginTop: "30px" }}>
-              Datos Laborales
+              Información Laboral y Financiera
             </h2>
 
             {/* FILA 5: EMPRESA Y CARGO */}
-            <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
+            <div
+              style={{
+                display: "flex",
+                gap: "20px",
+                flexWrap: "wrap",
+                marginBottom: "20px",
+              }}
+            >
               {/* EMPRESA */}
               <div style={{ flex: 1, minWidth: "300px" }}>
                 <input
@@ -315,7 +383,6 @@ export default function RequestCredit() {
                 />
                 {errors.empresa && <ErrorMessage message={errors.empresa} />}
               </div>
-
               {/* CARGO */}
               <div style={{ flex: 1, minWidth: "300px" }}>
                 <input
@@ -324,7 +391,7 @@ export default function RequestCredit() {
                   }`}
                   type="text"
                   name="cargo"
-                  placeholder="Cargo que ocupa *"
+                  placeholder="Cargo *"
                   value={form.cargo}
                   onChange={handleChange}
                 />
@@ -332,8 +399,16 @@ export default function RequestCredit() {
               </div>
             </div>
 
-            {/* FILA 6: INGRESOS (Campo único, ocupa todo el ancho) */}
-            <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
+            {/* FILA 6: INGRESOS */}
+            <div
+              style={{
+                display: "flex",
+                gap: "20px",
+                flexWrap: "wrap",
+                marginBottom: "20px",
+              }}
+            >
+              {/* INGRESOS */}
               <div style={{ flex: 1, minWidth: "300px" }}>
                 <input
                   className={`simulator__input ${
@@ -358,69 +433,105 @@ export default function RequestCredit() {
             </button>
           </form>
         )}
+        {/* FIN: FORMULARIO DE ENTRADA */}
 
-        {/* RESUMEN ANTES DE CONFIRMAR (Muestra solo si showResumen es true) */}
+        {/* RESUMEN ANTES DE CONFIRMAR (COMPLETO) */}
         {showResumen && (
           <div
-            className="card"
-            style={{ maxWidth: "600px", width: "100%", padding: "20px" }}
+            className="resumen"
+            style={{
+              width: "100%",
+              maxWidth: "800px",
+              padding: "20px",
+              backgroundColor: "#f9f9f9",
+              borderRadius: "8px",
+            }}
           >
-            <h2>Resumen de Solicitud</h2>
-
-            <ul
-              className="card__details"
-              style={{ listStyle: "none", padding: 0 }}
+            <h2
+              style={{
+                marginBottom: "15px",
+                borderBottom: "1px solid #ccc",
+                paddingBottom: "10px",
+              }}
             >
-              <li>
-                <strong>Nombre:</strong> {form.nombre}
-              </li>
-              <li>
-                <strong>Cédula:</strong> {form.cedula}
-              </li>
-              <li>
-                <strong>Email:</strong> {form.email}
-              </li>
-              <li>
-                <strong>Teléfono:</strong> {form.telefono}
-              </li>
-              <li>
-                <strong>Crédito:</strong> {nombreCredito}
-              </li>
-              <li>
-                <strong>Monto:</strong> ${Number(form.monto).toLocaleString()}
-              </li>
-              <li>
-                <strong>Plazo:</strong> {form.plazo} meses
-              </li>
-              <li>
-                <strong>Destino:</strong> {form.destino}
-              </li>
-              <li style={{ marginTop: "15px" }}>--- Datos Laborales ---</li>
-              <li>
-                <strong>Empresa:</strong> {form.empresa}
-              </li>
-              <li>
-                <strong>Ingresos:</strong> $
-                {Number(form.ingresos).toLocaleString()}
-              </li>
-            </ul>
+              Resumen de Solicitud
+            </h2>
+
+            <p>
+              <strong>Tipo de Crédito:</strong> {nombreCredito}
+            </p>
+            <p>
+              <strong>Monto Solicitado:</strong> $
+              {Number(form.monto).toLocaleString()}
+            </p>
+            <p>
+              <strong>Plazo:</strong> {form.plazo} meses
+            </p>
+            <p>
+              <strong>Destino:</strong> {form.destino}
+            </p>
+
+            <h3
+              style={{
+                marginTop: "20px",
+                marginBottom: "10px",
+                borderBottom: "1px solid #ccc",
+                paddingBottom: "5px",
+              }}
+            >
+              Datos del Solicitante
+            </h3>
+            <p>
+              <strong>Nombre:</strong> {form.nombre}
+            </p>
+            <p>
+              <strong>Cédula:</strong> {form.cedula}
+            </p>
+            <p>
+              <strong>Email:</strong> {form.email}
+            </p>
+            <p>
+              <strong>Teléfono:</strong> {form.telefono}
+            </p>
+
+            <h3
+              style={{
+                marginTop: "20px",
+                marginBottom: "10px",
+                borderBottom: "1px solid #ccc",
+                paddingBottom: "5px",
+              }}
+            >
+              Información Laboral
+            </h3>
+            <p>
+              <strong>Empresa:</strong> {form.empresa}
+            </p>
+            <p>
+              <strong>Cargo:</strong> {form.cargo}
+            </p>
+            <p>
+              <strong>Ingresos:</strong> $
+              {Number(form.ingresos).toLocaleString()}
+            </p>
 
             <button
               className="simulator__button"
-              style={{ marginTop: "20px" }}
-              onClick={enviarSolicitud}
+              style={{ marginTop: "30px", marginRight: "10px" }}
+              onClick={() => setShowResumen(false)} // Permite regresar al formulario
+            >
+              &larr; Volver al Formulario
+            </button>
+            <button
+              className="simulator__button"
+              style={{ marginTop: "30px" }}
+              onClick={enviarSolicitud} // Llama a la nueva función asíncrona de guardado
             >
               Confirmar y Enviar Solicitud
             </button>
-            <button
-              className="simulator__button"
-              style={{ marginTop: "10px", backgroundColor: "#999" }}
-              onClick={() => setShowResumen(false)}
-            >
-              Modificar Datos
-            </button>
           </div>
         )}
+        {/* FIN: RESUMEN ANTES DE CONFIRMAR */}
       </div>
     </div>
   );

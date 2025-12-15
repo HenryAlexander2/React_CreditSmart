@@ -1,8 +1,11 @@
+// src/components/Navbar.jsx (Versión para el Usuario Final)
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const closeMenu = () => setOpen(false);
 
   return (
     <header className="navbar">
@@ -19,15 +22,16 @@ export default function Navbar() {
       </button>
 
       <nav className={`navbar__links nav-menu ${open ? "is-open" : ""}`}>
-        <Link to="/" onClick={() => setOpen(false)}>
+        <Link to="/" onClick={closeMenu}>
           Inicio
         </Link>
-        <Link to="/simulador" onClick={() => setOpen(false)}>
+        <Link to="/simulador" onClick={closeMenu}>
           Simulador
         </Link>
-        <Link to="/solicitar" onClick={() => setOpen(false)}>
+        <Link to="/solicitar" onClick={closeMenu}>
           Solicitar Crédito
         </Link>
+        {/* ELIMINAMOS EL ENLACE A "/solicitudes" POR SEGURIDAD */}
       </nav>
     </header>
   );
